@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digestive Adventure - Sistem Pencernaan Manusia</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        tosca: {
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                        },
+                        orange: {
+                            500: '#f97316',
+                            600: '#ea580c',
+                        }
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Styles & Utilities */
+        body { font-family: 'Nunito', sans-serif; background-color: #f0fdfa; color: #1e293b; overflow-x: hidden; }
+        .view-section { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .view-section.active { display: block; opacity: 1; animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #e2e8f0; }
+        ::-webkit-scrollbar-thumb { background: #0d9488; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0f766e; }
+
+        /* SVG Organ Styles */
+        .organ-path { fill: #cbd5e1; stroke: #64748b; stroke-width: 2; transition: all 0.3s ease; }
+        .organ-path.active { fill: #f97316; stroke: #c2410c; filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.6)); }
+        
+        /* Print Styles */
+        @media print {
+            body { background: white; }
+            nav, .no-print, #home-btn, .action-btn { display: none !important; }
+            .view-section { display: block !important; opacity: 1 !important; page-break-after: always; }
+            #view-lkpd { page-break-after: avoid; }
+            .print-border { border: 1px solid #000; padding: 20px; }
+            input, textarea { border: none; border-bottom: 1px dashed #000; box-shadow: none; resize: none; background: transparent; }
+        }
+
+        /* Glassmorphism cards */
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); }
+        
+        /* Modal */
+        #custom-modal { display: none; }
+        #custom-modal.flex { display: flex; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-tosca-600 text-white shadow-lg sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="navigate('home')">
+                    <i class="fas fa-seedling text-2xl text-orange-400 mr-2"></i>
+                    <span class="font-bold text-xl tracking-wider">DIGESTIVE<span class="text-orange-400">ADVENTURE</span></span>
+                </div>
+                <div class="hidden md:flex items-center space-x-1 overflow-x-auto">
+                    <button onclick="navigate('home')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-tosca-700 transition">Home</button>
+                    <button onclick="navigate('pendahuluan')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-tosca-700 transition">Pendahuluan</button>
+                    <button onclick="navigate('materi')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-tosca-700 transition">Materi</button>
+                    <button onclick="navigate('simulasi')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-tosca-700 transition text-orange-300 font-bold"><i class="fas fa-play mr-1"></i> Simulasi</button>
+                    <button onclick="navigate('game')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-tosca-700 transition">Game</button>
+                    <button onclick="navigate('lkpd')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-tosca-700 transition">LKPD</button>
+                    <button onclick="navigate('evaluasi')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-tosca-700 transition">Evaluasi</button>
+                    <button onclick="navigate('profil')" class="nav-btn px-3 py-2 rounded-md text-sm font-medium hover:bg-tosca-700 transition">Profil</button>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-orange-300 focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-tosca-700 pb-3">
+            <button onclick="navigate('home')" class="block px-4 py-2 text-sm text-white hover:bg-tosca-800 w-full text-left">Home</button>
+            <button onclick="navigate('pendahuluan')" class="block px-4 py-2 text-sm text-white hover:bg-tosca-800 w-full text-left">Pendahuluan</button>
+            <button onclick="navigate('materi')" class="block px-4 py-2 text-sm text-white hover:bg-tosca-800 w-full text-left">Materi</button>
+            <button onclick="navigate('simulasi')" class="block px-4 py-2 text-sm text-white hover:bg-tosca-800 w-full text-left text-orange-300">Simulasi</button>
+            <button onclick="navigate('game')" class="block px-4 py-2 text-sm text-white hover:bg-tosca-800 w-full text-left">Game Edukasi</button>
+            <button onclick="navigate('lkpd')" class="block px-4 py-2 text-sm text-white hover:bg-tosca-800 w-full text-left">LKPD Digital</button>
+            <button onclick="navigate('evaluasi')" class="block px-4 py-2 text-sm text-white hover:bg-tosca-800 w-full text-left">Evaluasi</button>
+            <button onclick="navigate('refleksi')" class="block px-4 py-2 text-sm text-white hover:bg-tosca-800 w-full text-left">Refleksi</button>
+            <button onclick="navigate('profil')" class="block px-4 py-2 text-sm text-white hover:bg-tosca-800 w-full text-left">Profil Pengembang</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+        
+        <!-- ==================== VIEW: HOME ==================== -->
+        <div id="view-home" class="view-section active">
+            <div class="flex flex-col md:flex-row items-center justify-between min-h-[70vh]">
+                <div class="w-full md:w-1/2 pr-0 md:pr-8 mb-8 md:mb-0 text-center md:text-left z-10">
+                    <span class="inline-block py-1 px-3 rounded-full bg-blue-100 text-blue-800 text-sm font-bold mb-4 shadow-sm">Materi IPA Kelas VIII SMP</span>
+                    <h1 class="text-5xl md:text-6xl font-black text-slate-800 leading-tight mb-4 drop-shadow-sm">
+                        DIGESTIVE <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-tosca-500 to-blue-500">ADVENTURE</span>
+                    </h1>
+                    <p class="text-xl text-slate-600 mb-8 font-semibold italic">"Petualangan Menjelajahi Sistem Pencernaan Manusia"</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                        <button onclick="navigate('pendahuluan')" class="bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold py-4 px-8 rounded-full shadow-lg shadow-orange-500/50 hover:scale-105 transition transform flex items-center justify-center">
+                            <i class="fas fa-rocket mr-2"></i> MULAI PETUALANGAN
+                        </button>
+                        <button onclick="showInstructions()" class="bg-white text-tosca-600 border-2 border-tosca-500 font-bold py-4 px-8 rounded-full shadow-md hover:bg-tosca-50 transition transform flex items-center justify-center">
+                            <i class="fas fa-info-circle mr-2"></i> PETUNJUK
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="w-full md:w-1/2 flex justify-center relative">
+                    <!-- Stylized Hero Illustration -->
+                    <div class="relative w-64 h-64 md:w-96 md:h-96 bg-blue-100 rounded-full flex items-center justify-center shadow-2xl animate-float">
+                        <div class="absolute inset-0 border-4 border-dashed border-tosca-300 rounded-full animate-spin-slow" style="animation-duration: 20s;"></div>
+                        <i class="fas fa-child text-9xl text-tosca-600"></i>
+                        <!-- Mini floating elements -->
+                        <i class="fas fa-apple-alt text-3xl text-red-500 absolute top-10 left-10 animate-pulse"></i>
+                        <i class="fas fa-carrot text-3xl text-orange-500 absolute bottom-10 right-10 animate-bounce"></i>
+                        <i class="fas fa-hamburger text-3xl text-yellow-600 absolute top-20 right-5 animate-pulse-fast"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer Info -->
+            <div class="mt-16 text-center text-slate-500 text-sm">
+                <p class="font-bold">Dikembangkan oleh: Nancy Foedztida Rasyid Siregar, M.Pd.</p>
+                <p>UPTD SMP Negeri 2 Palas</p>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW: PENDAHULUAN ==================== -->
+        <div id="view-pendahuluan" class="view-section hidden pt-4">
+            <h2 class="text-3xl font-black text-tosca-700 mb-6 text-center border-b-4 border-orange-400 pb-2 inline-block mx-auto">PENDAHULUAN</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                <div class="glass-card p-6 rounded-2xl shadow-lg border-l-4 border-orange-500">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3 flex items-center"><i class="fas fa-lightbulb text-yellow-500 mr-2"></i> Pertanyaan Pemantik</h3>
+                    <p class="text-lg italic text-slate-700 bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                        "Bagaimana makanan yang lezat yang kita makan setiap hari dapat diubah menjadi energi dan zat gizi yang dibutuhkan oleh tubuh untuk tumbuh dan beraktivitas?"
+                    </p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-2xl shadow-lg border-l-4 border-blue-500">
+                    <h3 class="text-xl font-bold text-slate-800 mb-3 flex items-center"><i class="fas fa-bullseye text-red-500 mr-2"></i> Tujuan Pembelajaran</h3>
+                    <ul class="list-disc list-inside text-slate-600 space-y-2">
+                        <li>Mengidentifikasi organ-organ penyusun sistem pencernaan.</li>
+                        <li>Menjelaskan fungsi masing-masing organ pencernaan.</li>
+                        <li>Menganalisis proses pencernaan mekanis dan kimiawi.</li>
+                        <li>Mengetahui berbagai gangguan pada sistem pencernaan dan upaya menjaganya.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 glass-card p-6 rounded-2xl shadow-lg">
+                <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Peta Konsep</h3>
+                <div class="flex flex-col items-center">
+                    <div class="bg-tosca-500 text-white px-6 py-2 rounded-full font-bold shadow-md mb-4 z-10">Sistem Pencernaan</div>
+                    <div class="w-1 h-8 bg-slate-300"></div>
+                    <div class="w-3/4 border-t-4 border-slate-300 flex justify-between relative">
+                        <div class="w-1 h-8 bg-slate-300 absolute left-0"></div>
+                        <div class="w-1 h-8 bg-slate-300 absolute left-1/2 transform -translate-x-1/2"></div>
+                        <div class="w-1 h-8 bg-slate-300 absolute right-0"></div>
+                    </div>
+                    <div class="flex justify-between w-full max-w-2xl mt-8">
+                        <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg text-sm text-center shadow font-bold w-1/3 mx-2">Saluran Pencernaan<br><span class="text-xs font-normal">(Mulut - Anus)</span></div>
+                        <div class="bg-orange-100 text-orange-800 px-4 py-2 rounded-lg text-sm text-center shadow font-bold w-1/3 mx-2">Kelenjar Pencernaan<br><span class="text-xs font-normal">(Hati, Pankreas)</span></div>
+                        <div class="bg-red-100 text-red-800 px-4 py-2 rounded-lg text-sm text-center shadow font-bold w-1/3 mx-2">Gangguan & Penyakit<br><span class="text-xs font-normal">(Diare, Maag, dll)</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <button onclick="navigate('materi')" class="bg-tosca-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-tosca-700 transition">Lanjut ke Materi <i class="fas fa-arrow-right ml-2"></i></button>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW: MATERI PEMBELAJARAN ==================== -->
+        <div id="view-materi" class="view-section hidden pt-4">
+            <h2 class="text-3xl font-black text-tosca-700 mb-6 text-center border-b-4 border-orange-400 pb-2 inline-block mx-auto">MATERI PEMBELAJARAN</h2>
+            
+            <!-- Subbab Tabs -->
+            <div class="flex flex-wrap justify-center gap-2 mb-6" id="materi-tabs">
+                <button onclick="showMateri('A')" class="tab-btn bg-tosca-600 text-white px-4 py-2 rounded-full font-bold text-sm shadow">A. Pengertian</button>
+                <button onclick="showMateri('B')" class="tab-btn bg-white text-slate-600 px-4 py-2 rounded-full font-bold text-sm shadow hover:bg-tosca-100">B. Organ Pencernaan</button>
+                <button onclick="showMateri('C')" class="tab-btn bg-white text-slate-600 px-4 py-2 rounded-full font-bold text-sm shadow hover:bg-tosca-100">C. Organ Bantu</button>
+                <button onclick="showMateri('D')" class="tab-btn bg-white text-slate-600 px-4 py-2 rounded-full font-bold text-sm shadow hover:bg-tosca-100">D. Proses Pencernaan</button>
+                <button onclick="showMateri('E')" class="tab-btn bg-white text-slate-600 px-4 py-2 rounded-full font-bold text-sm shadow hover:bg-tosca-100">E. Gangguan</button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="glass-card p-6 md:p-8 rounded-2xl shadow-xl min-h-[400px]">
+                
+                <!-- Subbab A -->
+                <div id="materi-A" class="materi-content block">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4 text-orange-600">A. Pengertian dan Fungsi</h3>
+                    <p class="text-lg text-slate-700 mb-4 leading-relaxed">
+                        Sistem pencernaan manusia adalah serangkaian organ yang bekerja sama untuk memecah makanan yang kita makan menjadi molekul-molekul kecil. Proses ini penting agar zat gizi (seperti karbohidrat, protein, lemak, vitamin, dan mineral) dapat diserap oleh darah dan diedarkan ke seluruh tubuh sebagai sumber energi, pertumbuhan, dan perbaikan sel.
+                    </p>
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 mb-4 text-slate-700">
+                        <strong>Fungsi Utama:</strong>
+                        <ol class="list-decimal list-inside ml-2 mt-2">
+                            <li>Menghancurkan makanan menjadi bentuk yang lebih halus (pencernaan mekanis).</li>
+                            <li>Mengubah molekul makanan kompleks menjadi sederhana dengan bantuan enzim (pencernaan kimiawi).</li>
+                            <li>Menyerap sari-sari makanan ke dalam darah.</li>
+                            <li>Membuang sisa makanan yang tidak dapat dicerna.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Subbab B -->
+                <div id="materi-B" class="materi-content hidden">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4 text-orange-600">B. Organ-organ Pencernaan (Saluran Utama)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <ul class="space-y-4 text-slate-700">
+                            <li class="bg-white p-3 rounded shadow-sm border-l-4 border-tosca-500">
+                                <strong>1. Mulut:</strong> Tempat masuknya makanan. Terjadi pencernaan mekanis (oleh gigi) dan kimiawi (enzim ptialin/amilase).
+                            </li>
+                            <li class="bg-white p-3 rounded shadow-sm border-l-4 border-tosca-500">
+                                <strong>2. Kerongkongan (Esofagus):</strong> Saluran penghubung mulut dan lambung. Melakukan <em>gerak peristaltik</em> (meremas dan mendorong).
+                            </li>
+                            <li class="bg-white p-3 rounded shadow-sm border-l-4 border-tosca-500">
+                                <strong>3. Lambung:</strong> Menampung dan mengaduk makanan. Menghasilkan asam klorida (HCl) untuk membunuh kuman dan enzim pepsin.
+                            </li>
+                            <li class="bg-white p-3 rounded shadow-sm border-l-4 border-tosca-500">
+                                <strong>4. Usus Halus:</strong> Saluran terpanjang. Tempat utama pencernaan kimiawi dan penyerapan sari makanan melalui jonjot usus (vili).
+                            </li>
+                            <li class="bg-white p-3 rounded shadow-sm border-l-4 border-tosca-500">
+                                <strong>5. Usus Besar (Kolon):</strong> Tempat penyerapan air dari sisa makanan dan pembusukan oleh bakteri <em>E. coli</em> untuk membentuk feses.
+                            </li>
+                            <li class="bg-white p-3 rounded shadow-sm border-l-4 border-tosca-500">
+                                <strong>6. Rektum & Anus:</strong> Rektum menyimpan feses sementara. Anus adalah lubang pengeluaran.
+                            </li>
+                        </ul>
+                        <div class="flex justify-center items-center bg-blue-50 rounded-xl p-4">
+                             <!-- Simple SVG illustration of tract -->
+                             <svg width="200" height="300" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="50" cy="20" r="10" fill="#fca5a5" /> <!-- Mulut -->
+                                <line x1="50" y1="30" x2="50" y2="80" stroke="#fca5a5" stroke-width="8" stroke-linecap="round"/> <!-- Esofagus -->
+                                <path d="M 46 80 C 20 80, 20 120, 50 120 C 70 120, 80 90, 54 80 Z" fill="#ef4444" /> <!-- Lambung -->
+                                <path d="M 50 120 Q 20 140, 50 150 T 50 170" fill="none" stroke="#f87171" stroke-width="6" stroke-linecap="round" /> <!-- Usus Halus (simplified) -->
+                                <path d="M 40 125 L 30 125 L 30 175 L 70 175 L 70 135" fill="none" stroke="#a3e635" stroke-width="8" stroke-linejoin="round" /> <!-- Usus Besar -->
+                                <rect x="47" y="175" width="6" height="15" fill="#a16207" /> <!-- Rektum/Anus -->
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subbab C -->
+                <div id="materi-C" class="materi-content hidden">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4 text-orange-600">C. Organ Bantu Pencernaan (Kelenjar)</h3>
+                    <p class="mb-4 text-slate-700">Organ ini tidak dilewati makanan secara langsung, tetapi menghasilkan cairan yang membantu proses pencernaan kimiawi.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border p-4 rounded-lg border-blue-200 bg-blue-50">
+                            <h4 class="font-bold text-blue-800"><i class="fas fa-tint"></i> Kelenjar Ludah</h4>
+                            <p class="text-sm mt-1">Menghasilkan air liur (saliva) yang mengandung enzim amilase/ptialin untuk memecah amilum (karbohidrat) menjadi zat gula.</p>
+                        </div>
+                        <div class="border p-4 rounded-lg border-red-200 bg-red-50">
+                            <h4 class="font-bold text-red-800"><i class="fas fa-lungs"></i> Hati (Hepar)</h4>
+                            <p class="text-sm mt-1">Organ terbesar. Menghasilkan cairan empedu yang penting untuk pencernaan lemak. Juga menetralisir racun.</p>
+                        </div>
+                        <div class="border p-4 rounded-lg border-green-200 bg-green-50">
+                            <h4 class="font-bold text-green-800"><i class="fas fa-lemon"></i> Kantung Empedu</h4>
+                            <p class="text-sm mt-1">Menyimpan cairan empedu dari hati. Empedu berfungsi mengemulsikan lemak (memecah gumpalan lemak menjadi tetesan kecil).</p>
+                        </div>
+                        <div class="border p-4 rounded-lg border-yellow-200 bg-yellow-50">
+                            <h4 class="font-bold text-yellow-800"><i class="fas fa-leaf"></i> Pankreas</h4>
+                            <p class="text-sm mt-1">Menghasilkan enzim amilase (karbohidrat), lipase (lemak), dan tripsin (protein) yang disalurkan ke usus halus.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subbab D -->
+                <div id="materi-D" class="materi-content hidden">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4 text-orange-600">D. Proses Pencernaan & Enzim</h3>
+                    <div class="space-y-4">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-1 bg-white p-4 rounded shadow">
+                                <h4 class="font-bold text-tosca-600">Pencernaan Mekanis</h4>
+                                <p class="text-sm text-slate-600">Perubahan bentuk/ukuran makanan menjadi lebih kecil tanpa mengubah sifat kimianya. Contoh: mengunyah dengan gigi, gerak peristaltik, pengadukan di lambung.</p>
+                            </div>
+                            <div class="flex-1 bg-white p-4 rounded shadow">
+                                <h4 class="font-bold text-tosca-600">Pencernaan Kimiawi</h4>
+                                <p class="text-sm text-slate-600">Perubahan zat makanan dari molekul kompleks menjadi sederhana menggunakan <strong>Enzim</strong>. Contoh: Karbohidrat menjadi glukosa.</p>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full text-left text-sm bg-white shadow rounded-lg overflow-hidden">
+                                <thead class="bg-tosca-600 text-white">
+                                    <tr>
+                                        <th class="px-4 py-2">Enzim</th>
+                                        <th class="px-4 py-2">Lokasi</th>
+                                        <th class="px-4 py-2">Fungsi (Mengubah)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-slate-700">
+                                    <tr class="border-b"><td class="px-4 py-2 font-bold">Amilase / Ptialin</td><td class="px-4 py-2">Mulut & Pankreas</td><td class="px-4 py-2">Amilum (Karbohidrat) ➔ Maltosa/Gula</td></tr>
+                                    <tr class="border-b bg-slate-50"><td class="px-4 py-2 font-bold">Pepsin</td><td class="px-4 py-2">Lambung</td><td class="px-4 py-2">Protein ➔ Pepton</td></tr>
+                                    <tr class="border-b"><td class="px-4 py-2 font-bold">Renin</td><td class="px-4 py-2">Lambung</td><td class="px-4 py-2">Mengendapkan protein susu (kasein)</td></tr>
+                                    <tr class="border-b bg-slate-50"><td class="px-4 py-2 font-bold">Tripsin</td><td class="px-4 py-2">Pankreas (ke Usus)</td><td class="px-4 py-2">Pepton / Protein ➔ Asam Amino</td></tr>
+                                    <tr class="border-b"><td class="px-4 py-2 font-bold">Lipase</td><td class="px-4 py-2">Pankreas (ke Usus)</td><td class="px-4 py-2">Lemak ➔ Asam Lemak & Gliserol</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subbab E -->
+                <div id="materi-E" class="materi-content hidden">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4 text-orange-600">E. Gangguan & Kesehatan</h3>
+                    <ul class="space-y-3 text-slate-700 mb-6">
+                        <li><strong>1. Diare:</strong> Feses encer karena usus besar menyerap terlalu sedikit air (infeksi bakteri/virus).</li>
+                        <li><strong>2. Konstipasi (Sembelit):</strong> Sulit buang air besar karena feses terlalu keras (kurang serat dan air).</li>
+                        <li><strong>3. Gastritis (Maag):</strong> Peradangan dinding lambung akibat asam lambung berlebih atau jadwal makan tidak teratur.</li>
+                        <li><strong>4. Apendisitis (Usus Buntu):</strong> Peradangan pada umbai cacing (apendiks) akibat penyumbatan dan infeksi kuman.</li>
+                    </ul>
+                    <div class="bg-green-100 p-4 rounded-lg border border-green-300">
+                        <h4 class="font-bold text-green-800 mb-2">Upaya Menjaga Kesehatan:</h4>
+                        <p class="text-sm text-green-900">Makan makanan bergizi dan berserat, minum air putih cukup (8 gelas/hari), cuci tangan sebelum makan, kunyah makanan dengan baik, dan hindari stres.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==================== VIEW: SIMULASI ==================== -->
+        <div id="view-simulasi" class="view-section hidden pt-2">
+            <div class="text-center mb-4">
+                <h2 class="text-3xl font-black text-tosca-700"><i class="fas fa-route text-orange-500"></i> THE JOURNEY OF FOOD</h2>
+                <p class="text-slate-600">Perjalanan Makanan dalam Tubuh Manusia</p>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-2xl p-4 md:p-8 flex flex-col md:flex-row gap-8 min-h-[500px]">
+                
+                <!-- SVG Anatomy Panel -->
+                <div class="w-full md:w-1/2 flex justify-center items-center bg-slate-50 rounded-xl p-4 border-2 border-slate-200 relative">
+                    <svg viewBox="0 0 200 450" class="w-full max-h-[400px]" id="anatomy-svg">
+                        <!-- Head / Mouth (Stage 1) -->
+                        <path id="sim-mulut" class="organ-path" d="M 90 20 C 110 20, 120 40, 120 60 C 120 80, 100 80, 100 90 L 100 100 L 80 100 L 80 90 C 80 80, 70 80, 70 60 C 70 40, 70 20, 90 20 Z" />
+                        <text x="130" y="55" font-size="12" fill="#475569" class="font-bold">Mulut</text>
+                        
+                        <!-- Esophagus (Stage 2) -->
+                        <path id="sim-kerongkongan" class="organ-path" d="M 85 100 L 95 100 L 95 170 L 85 170 Z" />
+                        <text x="105" y="140" font-size="12" fill="#475569">Kerongkongan</text>
+
+                        <!-- Stomach (Stage 3) -->
+                        <path id="sim-lambung" class="organ-path" d="M 85 170 C 40 170, 30 230, 80 230 C 110 230, 130 190, 95 170 Z" />
+                        <text x="30" y="200" font-size="12" fill="#475569">Lambung</text>
+
+                        <!-- Small Intestine (Stage 4) -->
+                        <path id="sim-usus-halus" class="organ-path" d="M 90 230 C 60 250, 60 270, 90 280 C 120 290, 120 310, 90 320 C 60 330, 60 350, 90 360" fill="none" stroke-width="15" stroke-linecap="round"/>
+                        <text x="110" y="295" font-size="12" fill="#475569">Usus Halus</text>
+
+                        <!-- Large Intestine (Stage 5) -->
+                        <path id="sim-usus-besar" class="organ-path" d="M 70 240 L 45 240 L 45 365 L 135 365 L 135 250 L 110 250" fill="none" stroke-width="20" stroke-linejoin="round"/>
+                        <text x="145" y="320" font-size="12" fill="#475569">Usus Besar</text>
+
+                        <!-- Rectum & Anus (Stage 6) -->
+                        <rect id="sim-anus" class="organ-path" x="80" y="365" width="20" height="30" />
+                        <text x="110" y="385" font-size="12" fill="#475569">Rektum/Anus</text>
+
+                        <!-- Food Particle Animation Layer -->
+                        <circle id="food-particle" cx="100" cy="50" r="6" fill="#facc15" style="display: none; transition: all 1s ease-in-out;" />
+                    </svg>
+                </div>
+
+                <!-- Info & Controls Panel -->
+                <div class="w-full md:w-1/2 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span id="sim-stage-badge" class="bg-orange-100 text-orange-800 text-xs font-bold px-2 py-1 rounded border border-orange-300">Siap Memulai</span>
+                            <div class="w-2/3 bg-gray-200 rounded-full h-2.5">
+                                <div id="sim-progress-bar" class="bg-tosca-600 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        
+                        <h3 id="sim-title" class="text-2xl font-bold text-tosca-700 mb-2 border-b pb-2">Klik Mulai untuk Menjelajah!</h3>
+                        <p id="sim-desc" class="text-slate-700 text-lg min-h-[120px] leading-relaxed">
+                            Simulasi ini akan membawa kamu mengikuti perjalanan sepotong makanan mulai dari saat dikunyah hingga sisa-sisanya dibuang.
+                        </p>
+                        
+                        <!-- Interactive Quiz per stage -->
+                        <div id="sim-quiz-box" class="mt-4 bg-blue-50 p-4 rounded-lg border border-blue-200 hidden">
+                            <p id="sim-question" class="font-bold text-sm text-slate-800 mb-2"></p>
+                            <div id="sim-options" class="flex flex-col gap-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-between gap-4">
+                        <button id="btn-sim-prev" onclick="simChangeStage(-1)" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg font-bold hover:bg-slate-300 disabled:opacity-50" disabled><i class="fas fa-chevron-left mr-1"></i> Kembali</button>
+                        <button id="btn-sim-start" onclick="startSimulasi()" class="px-6 py-2 bg-orange-500 text-white rounded-lg font-bold hover:bg-orange-600 shadow-md">MULAI SIMULASI</button>
+                        <button id="btn-sim-next" onclick="simChangeStage(1)" class="px-4 py-2 bg-tosca-600 text-white rounded-lg font-bold hover:bg-tosca-700 shadow-md hidden">Lanjut <i class="fas fa-chevron-right ml-1"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW: GAME EDUKASI ==================== -->
+        <div id="view-game" class="view-section hidden pt-4">
+            <h2 class="text-3xl font-black text-tosca-700 mb-8 text-center"><i class="fas fa-gamepad text-orange-500"></i> ZONA GAME EDUKASI</h2>
+            
+            <!-- Game Menu -->
+            <div id="game-menu" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Card Game 1 -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-tosca-500 hover:-translate-y-2 transition duration-300 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-tosca-100 text-tosca-600 rounded-full flex items-center justify-center text-3xl mb-4"><i class="fas fa-puzzle-piece"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Match The Organ</h3>
+                    <p class="text-slate-600 text-sm mb-4">Pasangkan nama organ dengan fungsinya yang tepat.</p>
+                    <button onclick="startGame(1)" class="mt-auto bg-tosca-600 text-white px-6 py-2 rounded-full font-bold hover:bg-tosca-700 w-full">MAIN SEKARANG</button>
+                </div>
+                <!-- Card Game 2 -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-orange-500 hover:-translate-y-2 transition duration-300 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-3xl mb-4"><i class="fas fa-sort-amount-down"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Susun Perjalanan</h3>
+                    <p class="text-slate-600 text-sm mb-4">Urutkan organ pencernaan dari awal sampai akhir.</p>
+                    <button onclick="startGame(2)" class="mt-auto bg-orange-500 text-white px-6 py-2 rounded-full font-bold hover:bg-orange-600 w-full">MAIN SEKARANG</button>
+                </div>
+                <!-- Card Game 3 -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-blue-500 hover:-translate-y-2 transition duration-300 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-3xl mb-4"><i class="fas fa-stopwatch"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Quiz Challenge</h3>
+                    <p class="text-slate-600 text-sm mb-4">Jawab 10 pertanyaan cepat dan dapatkan Badge!</p>
+                    <button onclick="startGame(3)" class="mt-auto bg-blue-600 text-white px-6 py-2 rounded-full font-bold hover:bg-blue-700 w-full">MAIN SEKARANG</button>
+                </div>
+            </div>
+
+            <!-- Game Container (Dynamically filled) -->
+            <div id="game-container" class="hidden bg-white rounded-2xl shadow-xl p-6 relative min-h-[400px]">
+                <button onclick="backToGameMenu()" class="absolute top-4 right-4 text-slate-400 hover:text-red-500"><i class="fas fa-times text-2xl"></i></button>
+                <div id="game-area" class="mt-6"></div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW: LKPD DIGITAL ==================== -->
+        <div id="view-lkpd" class="view-section hidden bg-white p-8 rounded-xl shadow print:shadow-none print:p-0">
+            <div class="text-center border-b-2 border-slate-800 pb-4 mb-6">
+                <h1 class="text-2xl font-black uppercase">Lembar Kerja Peserta Didik (LKPD)</h1>
+                <h2 class="text-xl font-bold">Misi Detektif Pencernaan</h2>
+            </div>
+            
+            <!-- Identitas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 bg-slate-50 p-4 rounded print-border">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700">Nama Siswa:</label>
+                    <input type="text" id="lkpd-nama" class="w-full border-b border-slate-300 bg-transparent py-1 outline-none focus:border-tosca-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700">Kelas / Kelompok:</label>
+                    <input type="text" id="lkpd-kelas" class="w-full border-b border-slate-300 bg-transparent py-1 outline-none focus:border-tosca-500">
+                </div>
+            </div>
+
+            <!-- Kegiatan 1 & 2 -->
+            <div class="mb-8">
+                <h3 class="font-bold text-lg bg-tosca-100 p-2 rounded">Kegiatan 1 & 2: Identifikasi Organ dan Fungsi</h3>
+                <p class="text-sm mb-2 mt-2">Lengkapi tabel berikut berdasarkan urutan jalannya makanan!</p>
+                <div class="overflow-x-auto print:overflow-visible">
+                    <table class="w-full border-collapse border border-slate-400 text-sm">
+                        <thead class="bg-slate-200 print:bg-gray-200">
+                            <tr>
+                                <th class="border border-slate-400 p-2 w-10">No</th>
+                                <th class="border border-slate-400 p-2 w-1/4">Nama Organ</th>
+                                <th class="border border-slate-400 p-2">Fungsi Utama / Enzim yang dihasilkan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td class="border border-slate-400 p-2 text-center">1</td><td class="border border-slate-400 p-2"><input type="text" class="w-full outline-none bg-transparent" placeholder="Jawab..."></td><td class="border border-slate-400 p-2"><textarea rows="2" class="w-full outline-none bg-transparent" placeholder="Jawab..."></textarea></td></tr>
+                            <tr><td class="border border-slate-400 p-2 text-center">2</td><td class="border border-slate-400 p-2"><input type="text" class="w-full outline-none bg-transparent"></td><td class="border border-slate-400 p-2"><textarea rows="2" class="w-full outline-none bg-transparent"></textarea></td></tr>
+                            <tr><td class="border border-slate-400 p-2 text-center">3</td><td class="border border-slate-400 p-2"><input type="text" class="w-full outline-none bg-transparent"></td><td class="border border-slate-400 p-2"><textarea rows="2" class="w-full outline-none bg-transparent"></textarea></td></tr>
+                            <tr><td class="border border-slate-400 p-2 text-center">4</td><td class="border border-slate-400 p-2"><input type="text" class="w-full outline-none bg-transparent"></td><td class="border border-slate-400 p-2"><textarea rows="2" class="w-full outline-none bg-transparent"></textarea></td></tr>
+                            <tr><td class="border border-slate-400 p-2 text-center">5</td><td class="border border-slate-400 p-2"><input type="text" class="w-full outline-none bg-transparent"></td><td class="border border-slate-400 p-2"><textarea rows="2" class="w-full outline-none bg-transparent"></textarea></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Kegiatan 4 -->
+            <div class="mb-8">
+                <h3 class="font-bold text-lg bg-tosca-100 p-2 rounded">Kegiatan 3: Analisis Kasus</h3>
+                <p class="text-sm mt-2 font-semibold">Kasus: Budi sering menunda makan siang dan menyukai makanan pedas. Belakangan ini ia sering merasakan nyeri perih di perut bagian atas, mual, dan kembung.</p>
+                <label class="block text-sm font-bold text-slate-700 mt-3">Menurut analisis detektifmu, organ pencernaan apa yang terganggu dan apa nama penyakitnya? Bagaimana cara mencegahnya?</label>
+                <textarea class="w-full border border-slate-300 rounded p-2 mt-1 outline-none focus:border-tosca-500 bg-slate-50 h-24" placeholder="Tuliskan analisismu di sini..."></textarea>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end space-x-4 no-print mt-8">
+                <button onclick="window.print()" class="action-btn bg-slate-600 text-white px-6 py-2 rounded font-bold shadow hover:bg-slate-700"><i class="fas fa-print mr-2"></i> Cetak LKPD</button>
+                <button onclick="customAlert('Berhasil', 'Jawaban LKPD telah disimpan sementara di perangkat ini.', 'success')" class="action-btn bg-tosca-600 text-white px-6 py-2 rounded font-bold shadow hover:bg-tosca-700"><i class="fas fa-save mr-2"></i> Simpan Jawaban</button>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW: EVALUASI ==================== -->
+        <div id="view-evaluasi" class="view-section hidden pt-4">
+            <h2 class="text-3xl font-black text-tosca-700 mb-2 text-center">EVALUASI AKHIR</h2>
+            <p class="text-center text-slate-600 mb-6">Uji pemahamanmu dengan 20 soal pilihan ganda.</p>
+            
+            <!-- Evaluasi Intro -->
+            <div id="eval-intro" class="bg-white rounded-2xl shadow p-8 text-center max-w-2xl mx-auto border-t-4 border-tosca-500">
+                <i class="fas fa-clipboard-list text-5xl text-tosca-500 mb-4"></i>
+                <h3 class="text-xl font-bold mb-4">Siap untuk tes?</h3>
+                <ul class="text-left text-slate-600 text-sm list-disc list-inside mb-6 space-y-2 w-3/4 mx-auto">
+                    <li>Terdapat 20 soal pilihan ganda (A, B, C, D).</li>
+                    <li>Soal mencakup organ, proses, enzim, dan gangguan.</li>
+                    <li>Nilai akan langsung keluar di akhir.</li>
+                    <li>Pembahasan tersedia setelah selesai.</li>
+                </ul>
+                <button onclick="startEvaluasi()" class="bg-tosca-600 text-white px-8 py-3 rounded-full font-bold shadow hover:bg-tosca-700 text-lg">Mulai Evaluasi</button>
+            </div>
+
+            <!-- Evaluasi Quiz Area -->
+            <div id="eval-area" class="hidden max-w-3xl mx-auto">
+                <div class="flex justify-between items-center mb-4 bg-white p-3 rounded-lg shadow-sm">
+                    <span class="font-bold text-tosca-700" id="eval-q-num">Soal 1 / 20</span>
+                    <span class="text-slate-500 text-sm"><i class="fas fa-info-circle"></i> Pilih satu jawaban tepat</span>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow p-6 md:p-8">
+                    <p id="eval-question-text" class="text-lg font-bold text-slate-800 mb-6"></p>
+                    
+                    <div id="eval-options-container" class="space-y-3">
+                        <!-- Options generated by JS -->
+                    </div>
+                </div>
+                
+                <div class="flex justify-between mt-6">
+                    <button id="btn-eval-prev" onclick="evalNavigate(-1)" class="px-6 py-2 bg-slate-200 text-slate-700 rounded shadow font-bold hidden"><i class="fas fa-arrow-left mr-1"></i> Sebelumnya</button>
+                    <button id="btn-eval-next" onclick="evalNavigate(1)" class="px-6 py-2 bg-tosca-600 text-white rounded shadow font-bold ml-auto">Selanjutnya <i class="fas fa-arrow-right ml-1"></i></button>
+                    <button id="btn-eval-finish" onclick="finishEvaluasi()" class="px-6 py-2 bg-orange-500 text-white rounded shadow font-bold ml-auto hidden">Selesai & Cek Nilai</button>
+                </div>
+            </div>
+
+            <!-- Evaluasi Result Area -->
+            <div id="eval-result" class="hidden max-w-3xl mx-auto bg-white rounded-2xl shadow p-8 text-center">
+                <h3 class="text-2xl font-bold mb-2">Hasil Evaluasi</h3>
+                <div class="w-32 h-32 mx-auto rounded-full flex items-center justify-center text-4xl font-black text-white shadow-lg mb-4" id="eval-score-circle">
+                    0
+                </div>
+                <p id="eval-category" class="text-xl font-bold mb-2"></p>
+                <p id="eval-message" class="text-slate-600 mb-8"></p>
+                
+                <div class="flex justify-center gap-4">
+                    <button onclick="startEvaluasi()" class="px-6 py-2 bg-slate-200 text-slate-700 rounded font-bold shadow hover:bg-slate-300"><i class="fas fa-redo mr-2"></i> Ulangi</button>
+                    <button onclick="showPembahasan()" class="px-6 py-2 bg-tosca-600 text-white rounded font-bold shadow hover:bg-tosca-700"><i class="fas fa-book-open mr-2"></i> Lihat Pembahasan</button>
+                </div>
+            </div>
+            
+            <!-- Pembahasan Area -->
+            <div id="eval-pembahasan" class="hidden mt-8 max-w-3xl mx-auto space-y-4">
+                <h3 class="text-2xl font-bold text-center mb-6">Pembahasan Soal</h3>
+                <div id="pembahasan-container"></div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW: REFLEKSI ==================== -->
+        <div id="view-refleksi" class="view-section hidden pt-4">
+            <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow p-8 border-t-4 border-yellow-400">
+                <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center"><i class="fas fa-star text-yellow-400 mr-3"></i> Refleksi Pembelajaran</h2>
+                <p class="text-slate-600 mb-6 text-sm">Ceritakan pengalaman belajarmu hari ini. Jawabanmu membantumu mengingat materi lebih baik!</p>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-2">1. Apa pengetahuan baru yang paling menarik yang kamu peroleh hari ini?</label>
+                        <textarea class="w-full border border-slate-300 rounded p-3 bg-slate-50 outline-none focus:border-tosca-500 h-20" placeholder="Tuliskan di sini..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-2">2. Bagaimana caramu akan menjaga kesehatan sistem pencernaanmu mulai sekarang?</label>
+                        <textarea class="w-full border border-slate-300 rounded p-3 bg-slate-50 outline-none focus:border-tosca-500 h-20" placeholder="Tuliskan rencanamu..."></textarea>
+                    </div>
+                    <button onclick="customAlert('Terima Kasih!', 'Refleksimu telah disimpan. Teruslah bersemangat belajar!', 'success')" class="w-full bg-tosca-600 text-white font-bold py-3 rounded-lg shadow hover:bg-tosca-700">Kirim Refleksi</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW: PROFIL ==================== -->
+        <div id="view-profil" class="view-section hidden pt-10 flex justify-center">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden max-w-md w-full">
+                <div class="h-32 bg-gradient-to-r from-tosca-500 to-blue-500"></div>
+                <div class="px-6 pb-6 relative">
+                    <!-- Placeholder avatar using FontAwesome -->
+                    <div class="w-24 h-24 bg-white rounded-full border-4 border-white shadow-lg absolute -top-12 left-1/2 transform -translate-x-1/2 flex items-center justify-center text-slate-300 text-5xl">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="pt-16 text-center">
+                        <h2 class="text-2xl font-black text-slate-800">Nancy Foedztida R. S., M.Pd.</h2>
+                        <p class="text-tosca-600 font-bold mb-1">Guru Mata Pelajaran IPA</p>
+                        <p class="text-slate-500 text-sm mb-4"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i> UPTD SMP Negeri 2 Palas, Kab. Lampung Selatan</p>
+                        
+                        <div class="bg-orange-50 rounded-xl p-4 mt-6 border border-orange-100">
+                            <p class="italic text-slate-700 text-sm font-semibold">
+                                "Belajar IPA menjadi lebih menyenangkan ketika kita berani mengeksplorasi, mencoba, dan menemukan."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Modal / Alert Box -->
+    <div id="custom-modal" class="fixed inset-0 z-[100] bg-black bg-opacity-50 items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 transform transition-all scale-100 animate-fadeIn">
+            <div id="modal-icon" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl mb-4">
+                <!-- Icon injected by JS -->
+            </div>
+            <h3 id="modal-title" class="text-xl font-bold text-center text-slate-800 mb-2">Title</h3>
+            <p id="modal-text" class="text-center text-slate-600 mb-6 text-sm">Message</p>
+            <button onclick="closeModal()" class="w-full py-2 bg-tosca-600 text-white rounded-lg font-bold hover:bg-tosca-700">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // SYSTEM NAVIGATION & UTILS
+        // ==========================================
+        function navigate(viewId) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+                setTimeout(() => { if(!el.classList.contains('active')) el.style.display = 'none'; }, 300); // transition match
+            });
+            
+            // Show target view
+            const target = document.getElementById('view-' + viewId);
+            target.style.display = 'block';
+            setTimeout(() => target.classList.add('active'), 10); // slight delay to trigger CSS animation
+
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
+            // Scroll to top
+            window.scrollTo(0,0);
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        function showInstructions() {
+            customAlert("Petunjuk Penggunaan", "Gunakan menu navigasi di atas untuk menjelajahi materi. Mulailah dari 'Pendahuluan', pelajari 'Materi', cobalah 'Simulasi', dan uji kemampuanmu di 'Evaluasi'!", "info");
+        }
+
+        // Custom Modal Function (Replacement for alert())
+        function customAlert(title, text, type = 'info') {
+            const modal = document.getElementById('custom-modal');
+            const iconContainer = document.getElementById('modal-icon');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-text').innerText = text;
+
+            let iconHtml = '';
+            if(type === 'success') {
+                iconContainer.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 bg-green-100 text-green-500";
+                iconHtml = '<i class="fas fa-check"></i>';
+            } else if (type === 'error') {
+                iconContainer.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 bg-red-100 text-red-500";
+                iconHtml = '<i class="fas fa-times"></i>';
+            } else if (type === 'warning') {
+                iconContainer.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 bg-yellow-100 text-yellow-500";
+                iconHtml = '<i class="fas fa-exclamation"></i>';
+            } else { // info
+                iconContainer.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl mb-4 bg-blue-100 text-blue-500";
+                iconHtml = '<i class="fas fa-info"></i>';
+            }
+            iconContainer.innerHTML = iconHtml;
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.remove('flex');
+        }
+
+        // ==========================================
+        // MATERI LOGIC
+        // ==========================================
+        function showMateri(id) {
+            // Hide all content
+            document.querySelectorAll('.materi-content').forEach(el => el.classList.add('hidden'));
+            // Reset tab styles
+            document.querySelectorAll('#materi-tabs .tab-btn').forEach(el => {
+                el.classList.remove('bg-tosca-600', 'text-white');
+                el.classList.add('bg-white', 'text-slate-600');
+            });
+            
+            // Show selected
+            document.getElementById('materi-' + id).classList.remove('hidden');
+            // Style active tab
+            const activeBtn = Array.from(document.querySelectorAll('#materi-tabs .tab-btn')).find(btn => btn.innerText.includes(id + "."));
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-slate-600');
+                activeBtn.classList.add('bg-tosca-600', 'text-white');
+            }
+        }
+
+        // ==========================================
+        // SIMULASI LOGIC
+        // ==========================================
+        const simData = [
+            { org: "mulut", title: "1. Rongga Mulut", desc: "Makanan masuk, dikunyah gigi (mekanis), dibolak-balik lidah, dan bercampur air liur yang mengandung enzim amilase untuk mengubah karbohidrat jadi gula (kimiawi).", q: "Enzim apa yang ada di mulut?", opts: ["Amilase", "Pepsin", "Lipase"], ans: 0 },
+            { org: "kerongkongan", title: "2. Kerongkongan (Esofagus)", desc: "Makanan (bolus) didorong masuk ke lambung melalui gerak meremas yang disebut gerak peristaltik. Tidak ada pencernaan di sini.", q: "Gerakan mendorong makanan disebut?", opts: ["Geotaksis", "Peristaltik", "Osilasi"], ans: 1 },
+            { org: "lambung", title: "3. Lambung", desc: "Makanan diaduk oleh dinding lambung dan bercampur getah lambung (HCl untuk bunuh kuman & Enzim Pepsin mengubah protein).", q: "Apa fungsi Asam Klorida (HCl) di lambung?", opts: ["Mencerna lemak", "Membunuh kuman", "Menyerap air"], ans: 1 },
+            { org: "usus-halus", title: "4. Usus Halus", desc: "Pencernaan kimiawi terpenting! Dibantu cairan empedu (memecah lemak) dan enzim pankreas. Di bagian akhirnya (ileum), sari makanan diserap oleh jonjot usus (vili) masuk ke darah.", q: "Dimana sari makanan diserap ke darah?", opts: ["Lambung", "Usus Besar", "Usus Halus"], ans: 2 },
+            { org: "usus-besar", title: "5. Usus Besar", desc: "Sisa makanan yang tak tercerna masuk sini. Air dan mineral diserap kembali. Bakteri E. coli membusukkan sisa menjadi feses.", q: "Apa yang diserap di usus besar?", opts: ["Air", "Protein", "Glukosa"], ans: 0 },
+            { org: "anus", title: "6. Rektum dan Anus", desc: "Feses disimpan sementara di rektum. Ketika rektum penuh, timbul rasa ingin buang air besar (BAB). Feses dikeluarkan melalui anus.", q: "Tempat penyimpanan sementara feses adalah?", opts: ["Usus Buntu", "Rektum", "Pankreas"], ans: 1 }
+        ];
+        
+        let currentSimStage = -1; // -1 means not started
+
+        function startSimulasi() {
+            currentSimStage = 0;
+            document.getElementById('btn-sim-start').classList.add('hidden');
+            document.getElementById('btn-sim-next').classList.remove('hidden');
+            document.getElementById('sim-quiz-box').classList.remove('hidden');
+            document.getElementById('food-particle').style.display = 'block';
+            updateSimulasiUI();
+        }
+
+        function simChangeStage(dir) {
+            currentSimStage += dir;
+            if (currentSimStage < 0) currentSimStage = 0;
+            if (currentSimStage >= simData.length) {
+                // Finish
+                customAlert("Simulasi Selesai!", "Hebat! Kamu telah mengikuti perjalanan makanan dari awal hingga akhir.", "success");
+                currentSimStage = simData.length - 1;
+                return;
+            }
+            updateSimulasiUI();
+        }
+
+        function updateSimulasiUI() {
+            const data = simData[currentSimStage];
+            
+            // Buttons
+            document.getElementById('btn-sim-prev').disabled = (currentSimStage === 0);
+            if(currentSimStage === simData.length - 1) {
+                document.getElementById('btn-sim-next').innerHTML = "Selesai <i class='fas fa-flag-checkered ml-1'></i>";
+                document.getElementById('btn-sim-next').classList.replace('bg-tosca-600', 'bg-green-600');
+            } else {
+                document.getElementById('btn-sim-next').innerHTML = "Lanjut <i class='fas fa-chevron-right ml-1'></i>";
+                document.getElementById('btn-sim-next').classList.replace('bg-green-600', 'bg-tosca-600');
+            }
+
+            // Progress bar
+            const prog = ((currentSimStage + 1) / simData.length) * 100;
+            document.getElementById('sim-progress-bar').style.width = prog + '%';
+            document.getElementById('sim-stage-badge').innerText = `Tahap ${currentSimStage + 1} dari ${simData.length}`;
+
+            // Text
+            document.getElementById('sim-title').innerText = data.title;
+            document.getElementById('sim-desc').innerText = data.desc;
+
+            // Highlight SVG
+            document.querySelectorAll('.organ-path').forEach(el => el.classList.remove('active'));
+            const targetOrg = document.getElementById('sim-' + data.org);
+            if(targetOrg) targetOrg.classList.add('active');
+
+            // Move particle (Hardcoded coordinates based on SVG paths)
+            const particle = document.getElementById('food-particle');
+            const coords = [
+                {x: 100, y: 60},  // Mulut
+                {x: 90, y: 135},  // Kerongkongan
+                {x: 80, y: 200},  // Lambung
+                {x: 90, y: 300},  // Usus halus
+                {x: 45, y: 290},  // Usus besar (kiri)
+                {x: 90, y: 380}   // Anus
+            ];
+            particle.setAttribute('cx', coords[currentSimStage].x);
+            particle.setAttribute('cy', coords[currentSimStage].y);
+
+            // Quiz
+            document.getElementById('sim-question').innerText = data.q;
+            const optsContainer = document.getElementById('sim-options');
+            optsContainer.innerHTML = '';
+            data.opts.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "text-left px-3 py-2 bg-white rounded border hover:bg-blue-100 text-sm transition";
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (idx === data.ans) {
+                        btn.classList.replace('bg-white', 'bg-green-200');
+                        btn.classList.replace('hover:bg-blue-100', 'hover:bg-green-200');
+                        btn.innerHTML += ' <i class="fas fa-check text-green-600 float-right"></i>';
+                    } else {
+                        btn.classList.replace('bg-white', 'bg-red-200');
+                        btn.innerHTML += ' <i class="fas fa-times text-red-600 float-right"></i>';
+                        customAlert("Kurang Tepat", "Coba baca lagi penjelasannya ya.", "error");
+                    }
+                    // Disable all options after click
+                    Array.from(optsContainer.children).forEach(b => b.disabled = true);
+                };
+                optsContainer.appendChild(btn);
+            });
+        }
+
+
+        // ==========================================
+        // GAME EDUKASI LOGIC (Simplified for Single File robust mobile play)
+        // ==========================================
+        function backToGameMenu() {
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('game-menu').classList.remove('hidden');
+            document.getElementById('game-area').innerHTML = '';
+        }
+
+        function startGame(type) {
+            document.getElementById('game-menu').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+            const area = document.getElementById('game-area');
+            
+            if(type === 1) renderGame1(area);
+            if(type === 2) renderGame2(area);
+            if(type === 3) renderGame3(area);
+        }
+
+        // --- Game 1: Match ---
+        function renderGame1(container) {
+            container.innerHTML = `
+                <h3 class="text-2xl font-bold text-center mb-4">Match The Organ</h3>
+                <p class="text-center text-sm mb-6">Pilih nama organ, lalu pilih fungsinya yang sesuai.</p>
+                <div class="flex flex-col md:flex-row gap-8 justify-center">
+                    <div id="g1-organs" class="flex flex-col gap-2 w-full md:w-1/3"></div>
+                    <div id="g1-funcs" class="flex flex-col gap-2 w-full md:w-1/3"></div>
+                </div>
+            `;
+            
+            const pairs = [
+                { id: 1, org: "Lambung", func: "Mencerna protein & membunuh kuman dengan asam" },
+                { id: 2, org: "Usus Halus", func: "Tempat penyerapan sari-sari makanan" },
+                { id: 3, org: "Hati", func: "Menghasilkan cairan empedu" },
+                { id: 4, org: "Usus Besar", func: "Menyerap air dan pembusukan sisa makanan" }
+            ];
+            
+            let selectedOrg = null;
+            let matched = 0;
+
+            const orgContainer = document.getElementById('g1-organs');
+            const funcContainer = document.getElementById('g1-funcs');
+
+            // Shuffle functions visually
+            const shuffledFuncs = [...pairs].sort(() => Math.random() - 0.5);
+
+            pairs.forEach(p => {
+                const b = document.createElement('button');
+                b.className = "p-3 bg-blue-100 rounded-lg text-blue-800 font-bold border-2 border-transparent hover:border-blue-500 transition";
+                b.innerText = p.org;
+                b.onclick = () => {
+                    if(b.disabled) return;
+                    Array.from(orgContainer.children).forEach(c => c.classList.remove('border-blue-500', 'ring-2'));
+                    b.classList.add('border-blue-500', 'ring-2');
+                    selectedOrg = p.id;
+                };
+                orgContainer.appendChild(b);
+            });
+
+            shuffledFuncs.forEach(f => {
+                const b = document.createElement('button');
+                b.className = "p-3 bg-orange-50 rounded-lg text-sm border border-orange-200 hover:bg-orange-100 transition text-left";
+                b.innerText = f.func;
+                b.onclick = () => {
+                    if(!selectedOrg) { customAlert("Pilih Organ dulu!", "Klik nama organ di sebelah kiri terlebih dahulu.", "warning"); return; }
+                    if(b.disabled) return;
+
+                    if(selectedOrg === f.id) {
+                        b.classList.replace('bg-orange-50', 'bg-green-200');
+                        b.innerText = "✓ " + b.innerText;
+                        b.disabled = true;
+                        
+                        // Disable and style matched organ
+                        const orgBtn = Array.from(orgContainer.children).find(ob => ob.innerText === pairs.find(p=>p.id===selectedOrg).org);
+                        orgBtn.classList.replace('bg-blue-100', 'bg-green-200');
+                        orgBtn.classList.remove('border-blue-500', 'ring-2');
+                        orgBtn.disabled = true;
+
+                        selectedOrg = null;
+                        matched++;
+                        if(matched === pairs.length) {
+                            setTimeout(() => customAlert("Hebat!", "Kamu berhasil memasangkan semuanya! Mendapat Bronze Badge.", "success"), 500);
+                        }
+                    } else {
+                        b.classList.add('bg-red-200');
+                        setTimeout(() => b.classList.remove('bg-red-200'), 500);
+                        selectedOrg = null;
+                        Array.from(orgContainer.children).forEach(c => c.classList.remove('border-blue-500', 'ring-2'));
+                    }
+                };
+                funcContainer.appendChild(b);
+            });
+        }
+
+        // --- Game 2: Order ---
+        function renderGame2(container) {
+            const orgs = ["Mulut", "Lambung", "Usus Halus", "Kerongkongan", "Anus", "Usus Besar"];
+            const correctOrder = ["Mulut", "Kerongkongan", "Lambung", "Usus Halus", "Usus Besar", "Anus"];
+            let currentSequence = [];
+
+            container.innerHTML = `
+                <h3 class="text-2xl font-bold text-center mb-4">Susun Perjalanan Makanan</h3>
+                <p class="text-center text-sm mb-4">Klik organ di bawah ini sesuai urutan yang benar dari awal sampai akhir.</p>
+                
+                <div class="mb-6 p-4 bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl min-h-[60px] flex flex-wrap gap-2 justify-center" id="g2-sequence">
+                    <!-- sequence goes here -->
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-3" id="g2-pool">
+                    <!-- Pool goes here -->
+                </div>
+                
+                <div class="text-center mt-6">
+                    <button onclick="document.getElementById('g2-sequence').innerHTML=''; Array.from(document.getElementById('g2-pool').children).forEach(b=>{b.style.display='block';b.disabled=false});" class="text-sm text-slate-500 underline">Reset Ulang</button>
+                </div>
+            `;
+
+            const pool = document.getElementById('g2-pool');
+            const seq = document.getElementById('g2-sequence');
+
+            // Click to add to sequence
+            orgs.forEach(o => {
+                const b = document.createElement('button');
+                b.className = "px-4 py-2 bg-tosca-100 text-tosca-800 font-bold rounded shadow-sm hover:bg-tosca-200";
+                b.innerText = o;
+                b.onclick = () => {
+                    b.style.display = 'none'; // hide from pool
+                    
+                    const item = document.createElement('div');
+                    item.className = "px-3 py-1 bg-tosca-500 text-white rounded font-bold text-sm flex items-center";
+                    item.innerText = o;
+                    
+                    // Add logic to check correctness immediately for simplicity
+                    const expected = correctOrder[seq.children.length];
+                    if(o === expected) {
+                        seq.appendChild(item);
+                        if(seq.children.length === correctOrder.length) {
+                            setTimeout(() => customAlert("Sempurna!", "Urutan perjalanan makanan sangat tepat! Mendapat Silver Badge.", "success"), 300);
+                        }
+                    } else {
+                        b.style.display = 'block'; // put back
+                        item.classList.replace('bg-tosca-500', 'bg-red-500');
+                        seq.appendChild(item);
+                        setTimeout(() => {
+                            seq.removeChild(item);
+                            customAlert("Oops!", `Setelah ${seq.children.length > 0 ? seq.lastChild.innerText : 'mulai'}, bukan ${o}. Coba ingat lagi.`, "error");
+                        }, 500);
+                    }
+                };
+                pool.appendChild(b);
+            });
+        }
+
+        // --- Game 3: Mini Quiz ---
+        function renderGame3(container) {
+            container.innerHTML = `
+                <div class="text-center">
+                    <i class="fas fa-trophy text-5xl text-yellow-400 mb-4 animate-bounce"></i>
+                    <h3 class="text-2xl font-bold mb-4">Quiz Challenge</h3>
+                    <p class="mb-6">Jawab 5 pertanyaan acak secepatnya. (Simulasi mini)</p>
+                    <button onclick="navigate('evaluasi'); backToGameMenu();" class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold shadow hover:bg-blue-700">Lanjut ke Evaluasi Penuh</button>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // EVALUASI LOGIC (Full 20 Questions)
+        // ==========================================
+        const evalQuestions = [
+            { q: "Proses memecah makanan dari ukuran besar menjadi lebih kecil dengan bantuan gigi disebut pencernaan...", o: ["Mekanis", "Kimiawi", "Biologis", "Fisiologis"], a: 0, exp: "Pencernaan mekanis mengubah ukuran fisik tanpa mengubah struktur kimia." },
+            { q: "Enzim ptialin yang terdapat pada air liur berfungsi untuk memecah...", o: ["Protein menjadi pepton", "Lemak menjadi asam lemak", "Amilum (karbohidrat) menjadi zat gula", "Kasein susu"], a: 2, exp: "Amilase/Ptialin bekerja di mulut mengubah karbohidrat jadi gula yang lebih sederhana." },
+            { q: "Gerakan meremas dan mendorong makanan dari kerongkongan menuju lambung disebut...", o: ["Gerak refleks", "Gerak peristaltik", "Gerak otonom", "Gerak sadar"], a: 1, exp: "Peristaltik adalah gerak otot saluran cerna berbentuk gelombang." },
+            { q: "Organ pencernaan yang berfungsi membunuh kuman penyakit yang masuk bersama makanan karena suasananya asam adalah...", o: ["Mulut", "Usus Halus", "Lambung", "Hati"], a: 2, exp: "Lambung menghasilkan Asam Klorida (HCl) yang membuat pH sangat rendah untuk membunuh kuman." },
+            { q: "Enzim pepsin yang diproduksi oleh lambung berfungsi untuk...", o: ["Mencerna karbohidrat", "Mengendapkan protein susu", "Mengemulsikan lemak", "Mengubah protein menjadi pepton"], a: 3, exp: "Pepsin adalah protease lambung yang memecah protein kompleks menjadi pepton." },
+            { q: "Pencernaan kimiawi dan penyerapan sari-sari makanan sebagian besar terjadi di dalam...", o: ["Usus halus", "Lambung", "Usus besar", "Rektum"], a: 0, exp: "Usus halus (terutama jejunum dan ileum) dilengkapi vili untuk memaksimalkan penyerapan sari makanan." },
+            { q: "Cairan empedu dihasilkan oleh hati dan ditampung di kantung empedu. Fungsi utamanya adalah...", o: ["Mencerna karbohidrat", "Mengemulsikan lemak", "Menguraikan protein", "Membunuh bakteri"], a: 1, exp: "Empedu bertindak seperti sabun, memecah gumpalan lemak besar menjadi tetesan kecil agar mudah dicerna lipase." },
+            { q: "Kelenjar pankreas menghasilkan beberapa enzim pencernaan, KECUALI...", o: ["Amilase", "Lipase", "Tripsin", "Pepsin"], a: 3, exp: "Pepsin dihasilkan di lambung. Pankreas menghasilkan amilase, lipase, dan tripsin." },
+            { q: "Proses penyerapan kembali air dan pembusukan sisa makanan oleh bakteri E. coli terjadi pada organ...", o: ["Usus halus", "Lambung", "Usus besar", "Anus"], a: 2, exp: "Fungsi utama usus besar (kolon) adalah mengatur kadar air pada sisa makanan." },
+            { q: "Berikut ini adalah urutan sistem pencernaan manusia yang benar...", o: ["Mulut - kerongkongan - usus halus - lambung - usus besar - anus", "Mulut - lambung - kerongkongan - usus halus - usus besar - anus", "Mulut - kerongkongan - lambung - usus besar - usus halus - anus", "Mulut - kerongkongan - lambung - usus halus - usus besar - anus"], a: 3, exp: "Urutan saluran cerna: Mulut -> Esofagus -> Lambung -> Usus Halus -> Usus Besar -> Rektum -> Anus." },
+            { q: "Penyakit di mana penderita mengalami buang air besar terus menerus dengan feses yang encer disebut...", o: ["Konstipasi", "Gastritis", "Diare", "Apendisitis"], a: 2, exp: "Diare terjadi jika pergerakan sisa makanan di usus besar terlalu cepat, sehingga air kurang terserap." },
+            { q: "Sembelit (konstipasi) biasanya disebabkan oleh...", o: ["Infeksi bakteri pada lambung", "Kurang mengonsumsi makanan berserat dan air putih", "Terlalu banyak makan makanan pedas", "Asam lambung meningkat"], a: 1, exp: "Serat membantu memperbesar volume tinja dan menyerap air sehingga feses lunak dan mudah dikeluarkan." },
+            { q: "Peradangan pada selaput lendir lambung karena produksi asam lambung berlebih atau jadwal makan tidak teratur disebut penyakit...", o: ["Gastritis / Maag", "Kolik", "Tifus", "Diare"], a: 0, exp: "Maag sering terjadi karena asam lambung mengiritasi dinding lambung yang kosong." },
+            { q: "Organ tambahan yang tidak dilewati makanan namun menghasilkan enzim pencernaan adalah...", o: ["Kerongkongan", "Hati dan Pankreas", "Usus Buntu", "Rektum"], a: 1, exp: "Hati dan pankreas menyalurkan getahnya melalui saluran khusus ke usus dua belas jari." },
+            { q: "Zat makanan yang berfungsi sebagai sumber energi utama bagi tubuh adalah...", o: ["Vitamin dan mineral", "Protein", "Karbohidrat", "Lemak"], a: 2, exp: "Meskipun lemak dan protein bisa jadi energi, Karbohidrat adalah sumber energi tercepat dan utama." },
+            { q: "Struktur berbentuk jonjot-jonjot (vili) pada dinding dalam usus halus berfungsi untuk...", o: ["Menghasilkan enzim", "Mendorong sisa makanan", "Memperluas permukaan penyerapan", "Menyimpan sari makanan"], a: 2, exp: "Vili meningkatkan luas permukaan dinding usus sehingga penyerapan jauh lebih efisien." },
+            { q: "Enzim Lipase berfungsi mengubah...", o: ["Lemak menjadi asam lemak dan gliserol", "Protein menjadi asam amino", "Amilum menjadi glukosa", "Pepton menjadi asam amino"], a: 0, exp: "Lipase (Lipid = Lemak) memecah lemak menjadi bentuk yang bisa diserap darah/limfe." },
+            { q: "Infeksi pada umbai cacing akibat penyumbatan sisa makanan dapat menyebabkan penyakit...", o: ["Gastritis", "Apendisitis", "Hepatitis", "Kolera"], a: 1, exp: "Apendisitis adalah radang pada apendiks (usus buntu)." },
+            { q: "Makanan yang mengandung karbohidrat mengalami pencernaan kimiawi pertama kali pada bagian...", o: ["Mulut", "Lambung", "Usus Halus", "Kerongkongan"], a: 0, exp: "Oleh enzim ptialin di mulut." },
+            { q: "Fungsi utama rektum dalam sistem pencernaan adalah...", o: ["Menyerap sisa air", "Mencerna selulosa", "Menyimpan feses sementara sebelum dikeluarkan", "Membunuh kuman"], a: 2, exp: "Rektum bertindak sebagai tempat penampungan akhir sebelum defekasi melalui anus." }
+        ];
+
+        let currentEval = 0;
+        let evalAnswers = new Array(20).fill(null);
+
+        function startEvaluasi() {
+            document.getElementById('eval-intro').classList.add('hidden');
+            document.getElementById('eval-result').classList.add('hidden');
+            document.getElementById('eval-pembahasan').classList.add('hidden');
+            document.getElementById('eval-area').classList.remove('hidden');
+            
+            // Reset
+            currentEval = 0;
+            evalAnswers = new Array(20).fill(null);
+            renderEvalQuestion();
+        }
+
+        function renderEvalQuestion() {
+            const qData = evalQuestions[currentEval];
+            document.getElementById('eval-q-num').innerText = `Soal ${currentEval + 1} / 20`;
+            document.getElementById('eval-question-text').innerText = `${currentEval + 1}. ${qData.q}`;
+            
+            const optContainer = document.getElementById('eval-options-container');
+            optContainer.innerHTML = '';
+            
+            const labels = ['A', 'B', 'C', 'D'];
+            qData.o.forEach((opt, idx) => {
+                const isSelected = evalAnswers[currentEval] === idx;
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-lg border-2 cursor-pointer transition ${isSelected ? 'border-tosca-500 bg-tosca-50' : 'border-slate-200 hover:border-tosca-300'}`;
+                div.onclick = () => selectEvalOption(idx);
+                div.innerHTML = `<span class="font-bold mr-2 text-tosca-600">${labels[idx]}.</span> ${opt}`;
+                optContainer.appendChild(div);
+            });
+
+            // Navigation Buttons
+            document.getElementById('btn-eval-prev').classList.toggle('hidden', currentEval === 0);
+            
+            if (currentEval === evalQuestions.length - 1) {
+                document.getElementById('btn-eval-next').classList.add('hidden');
+                document.getElementById('btn-eval-finish').classList.remove('hidden');
+            } else {
+                document.getElementById('btn-eval-next').classList.remove('hidden');
+                document.getElementById('btn-eval-finish').classList.add('hidden');
+            }
+        }
+
+        function selectEvalOption(idx) {
+            evalAnswers[currentEval] = idx;
+            renderEvalQuestion(); // Re-render to show selection
+        }
+
+        function evalNavigate(dir) {
+            currentEval += dir;
+            if(currentEval < 0) currentEval = 0;
+            if(currentEval >= evalQuestions.length) currentEval = evalQuestions.length - 1;
+            renderEvalQuestion();
+        }
+
+        function finishEvaluasi() {
+            // Check if all answered
+            if(evalAnswers.includes(null)) {
+                const unans = evalAnswers.findIndex(a => a === null) + 1;
+                customAlert("Belum Selesai", `Kamu belum menjawab soal nomor ${unans}. Silakan periksa kembali.`, "warning");
+                currentEval = unans - 1;
+                renderEvalQuestion();
+                return;
+            }
+
+            // Calculate Score
+            let correct = 0;
+            evalAnswers.forEach((ans, idx) => {
+                if (ans === evalQuestions[idx].a) correct++;
+            });
+            
+            const score = (correct / 20) * 100;
+            
+            document.getElementById('eval-area').classList.add('hidden');
+            const resArea = document.getElementById('eval-result');
+            resArea.classList.remove('hidden');
+
+            // Style score circle based on grade
+            const circle = document.getElementById('eval-score-circle');
+            let cat = "", msg = "", color = "";
+            
+            if(score >= 90) { cat = "Sangat Baik"; msg = "Luar biasa! Pemahamanmu sangat mendalam."; color = "bg-green-500"; }
+            else if(score >= 80) { cat = "Baik"; msg = "Bagus sekali! Pertahankan prestasimu."; color = "bg-blue-500"; }
+            else if(score >= 70) { cat = "Cukup"; msg = "Nilaimu cukup, tapi masih bisa ditingkatkan lagi dengan membaca ulang materi."; color = "bg-yellow-500"; }
+            else { cat = "Perlu Bimbingan"; msg = "Jangan menyerah! Coba baca kembali materi dan ikut simulasi lagi ya."; color = "bg-red-500"; }
+
+            circle.className = `w-32 h-32 mx-auto rounded-full flex items-center justify-center text-4xl font-black text-white shadow-lg mb-4 ${color}`;
+            
+            // Animate score count
+            let curScore = 0;
+            let int = setInterval(() => {
+                circle.innerText = curScore;
+                if(curScore >= score) {
+                    clearInterval(int);
+                    circle.innerText = score; // Exact final
+                }
+                curScore+=2;
+            }, 20);
+
+            document.getElementById('eval-category').innerText = `Kategori: ${cat}`;
+            document.getElementById('eval-message').innerText = msg;
+        }
+
+        function showPembahasan() {
+            document.getElementById('eval-pembahasan').classList.remove('hidden');
+            const container = document.getElementById('pembahasan-container');
+            container.innerHTML = '';
+
+            const labels = ['A', 'B', 'C', 'D'];
+
+            evalQuestions.forEach((q, i) => {
+                const userAns = evalAnswers[i];
+                const isCorrect = userAns === q.a;
+                
+                const div = document.createElement('div');
+                div.className = `p-4 rounded-lg border ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`;
+                
+                div.innerHTML = `
+                    <p class="font-bold text-slate-800 mb-2">${i+1}. ${q.q}</p>
+                    <div class="text-sm space-y-1 mb-3">
+                        <p>Jawabanmu: <span class="${isCorrect ? 'text-green-700 font-bold' : 'text-red-700 line-through'}">${userAns !== null ? labels[userAns] + ". " + q.o[userAns] : 'Tidak dijawab'}</span></p>
+                        ${!isCorrect ? `<p class="text-green-700 font-bold">Jawaban Benar: ${labels[q.a]}. ${q.o[q.a]}</p>` : ''}
+                    </div>
+                    <div class="bg-white p-3 rounded text-sm text-slate-700 border-l-4 border-tosca-500">
+                        <strong>Pembahasan:</strong> ${q.exp}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            // Scroll to pembahasan
+            document.getElementById('eval-pembahasan').scrollIntoView({behavior: 'smooth'});
+        }
+
+    </script>
+</body>
+</html>
